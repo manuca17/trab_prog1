@@ -12,7 +12,7 @@ typedef struct {
 } Certificado;
 
 // Funções de gestão de certificados
-Certificado* criarCertificado(Certificado* cert);
+void criarCertificado(Certificado* cert);
 void destruirCertificado(Certificado* cert);
 void listarCertificados(Certificado* cert);
 void ordenarCertificadosNome(Certificado* cert);

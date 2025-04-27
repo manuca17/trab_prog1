@@ -14,7 +14,7 @@ typedef struct {
 } Usuario;
 
 // Funções de gestão de usuários
-Usuario* autenticarUsuario();
+void autenticarUsuario();
 void registrarUsuario();
 void listarUsuarios();
 void alterarTipo_usuario();
