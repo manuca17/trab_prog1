@@ -1,8 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "sistema.h"
+#include "estruturas.h"
+#include <locale.h>
+
+NoUsuario* usuarios = NULL;
+NoCertificado* certificados = NULL;
+NoAssinatura* assinaturas = NULL;
+
 
 int main(){
-    iniciarSistema();
+    setlocale(LC_ALL, "Portuguese");
+    iniciarSistema(&usuarios, &certificados, &assinaturas);
     return 0;
 }
