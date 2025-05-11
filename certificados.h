@@ -5,17 +5,18 @@
 
 #include "estruturas.h"
 #include <string.h>
+#include <time.h>
 
 // Funções de gestão de certificados
 void criarCertificado(NoCertificado** certificados, NoUsuario* usuarios);
 void destruirCertificado(Certificado* cert);
 void listarCertificados(NoCertificado* certificados);
 void ordenarCertificadosNome(NoCertificado** certificados);
-void ordenarCertificadosData(Certificado* cert);
+void ordenarCertificadosData(NoCertificado** certificados);
 void renovarCertificado(NoCertificado* certificados);
 void revogarCertificado(NoCertificado* certificados);
 void exportarCertificadosCsv(NoCertificado* certificados);
-void gerarRelatorioCertificados(Certificado* cert);
+void gerarRelatorioCertificados(NoCertificado* certificados);
 void alertasExpiracao();
 
 
@@ -261,5 +262,77 @@ void ordenarCertificadosNome(NoCertificado** certificados)
     } while (trocou);
 
     printf("Certificados ordenados por nome com sucesso!\n");
+}
+
+
+#include <time.h> // Para manipulação de datas
+
+void ordenarCertificadosData(NoCertificado **certificados)
+{
+    if (*certificados == NULL || (*certificados)->proximo == NULL)
+    {
+        printf("Não há certificados suficientes para ordenar.\n");
+        return;
+    }
+
+    int trocado;
+    NoCertificado *atual;
+    NoCertificado *ultimo = NULL;
+
+    do
+    {
+        trocado = 0;
+        atual = *certificados;
+
+        while (atual->proximo != ultimo)
+        {
+            // Supondo que a data seja armazenada como string no formato "YYYY-MM-DD"
+            if (strcmp(atual->dados.data_emissao, atual->proximo->dados.data_emissao) > 0)
+            {
+                // Troca os dados dos nós
+                Certificado temp = atual->dados;
+                atual->dados = atual->proximo->dados;
+                atual->proximo->dados = temp;
+
+                trocado = 1;
+            }
+            atual = atual->proximo;
+        }
+        ultimo = atual;
+    } while (trocado);
+
+    printf("Certificados ordenados por data com sucesso.\n");
+}
+
+#include <stdio.h>
+#include "estruturas.h"
+
+void gerarRelatorioCertificados(NoCertificado *certificados) {
+    if (certificados == NULL) {
+        printf("Não há certificados para gerar o relatório.\n");
+        return;
+    }
+
+    FILE *arquivo = fopen("ficheiros/text/relatorio_certificadoss.txt", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao criar o arquivo de relatório.\n");
+        return;
+    }
+
+    fprintf(arquivo, "Relatório de Certificados\n");
+    fprintf(arquivo, "==========================\n");
+
+    NoCertificado *atual = certificados;
+    while (atual != NULL) {
+        fprintf(arquivo, "ID: %d\n", atual->dados.id);
+        fprintf(arquivo, "Nome: %s\n", atual->dados.nome);
+        fprintf(arquivo, "Data de Emissão: %s\n", atual->dados.data_emissao);
+        fprintf(arquivo, "Data de Expiração: %s\n", atual->dados.data_validade);
+        fprintf(arquivo, "--------------------------\n");
+        atual = atual->proximo;
+    }
+
+    fclose(arquivo);
+    printf("Relatório de certificados gerado com sucesso: relatorio_certificados.txt\n");
 }
 #endif // CERTIFICADOS_H

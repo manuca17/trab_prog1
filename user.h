@@ -167,13 +167,13 @@ void menuAdmin(NoUsuario **usuarios, NoCertificado **certificados)
 
         case 9:
             // Ordenar certificados por data
-            //ordenarCertificadosData(*certificados);
+            ordenarCertificadosData(certificados);
             esperarTecla();
             break;
 
         case 10:
             // Gerar relatório de certificados
-            //gerarRelatorioCertificados(*certificados);
+            gerarRelatorioCertificados(*certificados);
             esperarTecla();
             break;
 
