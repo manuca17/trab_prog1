@@ -10,13 +10,17 @@
 
 // Funções de gestão de usuários
 void menuAdmin(NoUsuario **usuarios, NoCertificado **certificados);
-void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados);
+void menuUsuario(NoAssinatura **assin, NoCertificado **certificados, Usuario);
+void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados, NoAssinatura *assin);
 void registrarUsuario(NoUsuario **usuarios);
 void listarUsuarios(NoUsuario *usuarios);
 void alterarTipo_usuario(NoUsuario **usuarios);
 void bloquearUsuario(NoUsuario **usuarios);
+void estatisticasDeUso(NoAssinatura *assin, NoCertificado *certificados, Usuario user);
 
-void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados)
+Usuario currentUser;
+
+void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados, NoAssinatura *assin)
 {
     char username[50];
     char password[50];
@@ -35,14 +39,16 @@ void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados)
 
             if (atual->dados.tipo == ADMIN)
             {
+                currentUser = atual->dados; // Armazena o usuário atual
                 printf("Bem-vindo, administrador!\n");
                 menuAdmin(&usuarios, &certificados);
             }
             else if (atual->dados.tipo == USUARIO)
             {
+                currentUser = atual->dados;
                 printf("Bem-vindo, usuário!\n");
                 autenticado = 1;
-                // menuUsuario();
+                menuUsuario(&assin, &certificados, currentUser);
                 break;
             }
             else
@@ -185,7 +191,7 @@ void menuAdmin(NoUsuario **usuarios, NoCertificado **certificados)
 
         case 12:
             // Gerar alertas de expiração
-            //alertasExpiracao();
+            // alertasExpiracao();
             esperarTecla();
             break;
 
@@ -263,4 +269,78 @@ void bloquearUsuario(NoUsuario **usuarios)
     printf("Usuário não encontrado.\n");
 }
 
+void menuUsuario(NoAssinatura **assin, NoCertificado **certificados, Usuario user)
+{
+    int opcao;
+    do
+    {
+        printf("\n========== MENU USUÁRIO ==========\n");
+        printf("1. Consultar estado do certificado\n");
+        printf("2. Assinar documento digitalmente\n");
+        printf("3. Consultar histórico de assinaturas\n");
+        printf("4. Consultar estatísticas de uso\n");
+        printf("0. Sair\n");
+        printf("==================================\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao)
+        {
+        case 1:
+            // Consultar estado do certificado
+            listarCertificadoUsuario(*certificados, user); // Ou implemente uma função específica para mostrar só o do usuário
+            esperarTecla();
+            break;
+        case 2:
+        {
+            criarAssinatura(assin, *certificados);
+            esperarTecla();
+            break;
+        }
+        case 3:
+            // Consultar histórico pessoal de assinaturas
+            consultarHistoricoAssinaturas(*assin, *certificados, user);
+            esperarTecla();
+            break;
+        case 4:
+            // Consultar estatísticas de uso
+            estatisticasDeUso(*assin, *certificados, user);
+            esperarTecla();
+            break;
+        case 0:
+            printf("Saindo do menu usuário...\n");
+            break;
+        default:
+            printf("Opção inválida! Tente novamente.\n");
+            esperarTecla();
+        }
+    } while (opcao != 0);
+}
+
+void estatisticasDeUso(NoAssinatura *assin, NoCertificado *certificados, Usuario user){
+    int totalAssinaturas = 0;
+    int totalCertificados = 0;
+
+    // Contar assinaturas do usuário
+    NoAssinatura *atualAssinatura = assin;
+    while (atualAssinatura != NULL) {
+        if (atualAssinatura->dados.id_certificado == user.id_certificado) {
+            totalAssinaturas++;
+        }
+        atualAssinatura = atualAssinatura->proximo;
+    }
+
+    // Contar certificados do usuário
+    NoCertificado *atualCertificado = certificados;
+    while (atualCertificado != NULL) {
+        if (atualCertificado->dados.id == user.id_certificado) {
+            totalCertificados++;
+        }
+        atualCertificado = atualCertificado->proximo;
+    }
+
+    printf("\n===== Estatísticas de Uso do Usuário: %s =====\n", user.username);
+    printf("Total de Assinaturas: %d\n", totalAssinaturas);
+    printf("Total de Certificados: %d\n", totalCertificados);
+}
 #endif // USERS_H

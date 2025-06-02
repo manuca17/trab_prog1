@@ -4,12 +4,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "certificados.h"
 #include "assinaturas.h"
 #include "estruturas.h"
 
+#include <stdio.h>
+
 
 void esperarTecla();
+void gerarString64(char *destino);
 
 void esperarTecla()
 {
@@ -58,6 +62,18 @@ void carregarDadosFicticios() {
     fclose(file);
 
     printf("Dados fictícios carregados com sucesso!\n");
+}
+
+// Gera uma string aleatória de 64 caracteres
+void gerarString64(char *destino) {
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    int charsetSize = sizeof(charset) - 1;
+
+    for (int i = 0; i < 64; i++) {
+        int key = rand() % charsetSize;
+        destino[i] = charset[key];
+    }
+    destino[64] = '\0'; // Termina a string
 }
 
 #endif 

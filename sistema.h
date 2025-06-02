@@ -9,16 +9,16 @@
 
 // Funções principais do sistema;
 void iniciarSistema(NoUsuario **usuarios, NoCertificado **certificados, NoAssinatura **assinaturas);
-void menuPrincipal(NoUsuario **usuarios, NoCertificado **certificados);
-void menuUsuario();
+void menuPrincipal(NoUsuario **usuarios, NoCertificado **certificados, NoAssinatura **assin);
 void carregarDados(NoUsuario **usuarios, NoCertificado **certificados, NoAssinatura **assinaturas);
 void carregarUsuarios(NoUsuario **usuarios);
 void carregarCertificados(NoCertificado **certificados);
 void carregarAssinaturas(NoAssinatura **assinaturas);
 void salvarDados();
 void logOperacao();
+void salvarDadosEmFicheiros(NoUsuario *usuarios, NoCertificado *certificados, NoAssinatura *assinaturas);
 
-void menuPrincipal(NoUsuario **usuarios, NoCertificado **certificados)
+void menuPrincipal(NoUsuario **usuarios, NoCertificado **certificados, NoAssinatura **assin)
 {
     int opcao = -1;
 
@@ -43,7 +43,7 @@ void menuPrincipal(NoUsuario **usuarios, NoCertificado **certificados)
         case 1:
             // Chamar função de login
             printf("\nLogin selecionado\n");
-            autenticarUsuario(*usuarios, *certificados);
+            autenticarUsuario(*usuarios, *certificados, *assin);
             esperarTecla();
             break;
 
@@ -173,7 +173,56 @@ void iniciarSistema(NoUsuario **usuarios, NoCertificado **certificados, NoAssina
 {
     carregarDadosFicticios();
     carregarDados(usuarios, certificados, assinaturas);
-    menuPrincipal(usuarios, certificados);
+    menuPrincipal(usuarios, certificados, assinaturas);
+}
+
+void salvarDadosEmFicheiros(NoUsuario *usuarios, NoCertificado *certificados, NoAssinatura *assinaturas) {
+    // Salvar usuários (exemplo em binário)
+    FILE *fUsuarios = fopen("ficheiros/dat/users.dat", "wb");
+    if (fUsuarios != NULL) {
+        NoUsuario *atual = usuarios;
+        while (atual != NULL) {
+            fwrite(&atual->dados, sizeof(Usuario), 1, fUsuarios);
+            atual = atual->proximo;
+        }
+        fclose(fUsuarios);
+    } else {
+        printf("Erro ao salvar usuários.\n");
+    }
+
+    // Salvar certificados (exemplo em texto)
+    FILE *fCertificados = fopen("ficheiros/text/relatorio_certificados.txt", "w");
+    if (fCertificados != NULL) {
+        NoCertificado *atual = certificados;
+        while (atual != NULL) {
+            fprintf(fCertificados, "%d %s %s %s %s %s %s\n",
+                atual->dados.id,
+                atual->dados.nome,
+                atual->dados.email,
+                atual->dados.data_emissao,
+                atual->dados.data_validade,
+                atual->dados.estado,
+                atual->dados.chave_publica
+            );
+            atual = atual->proximo;
+        }
+        fclose(fCertificados);
+    } else {
+        printf("Erro ao salvar certificados.\n");
+    }
+
+    // Salvar assinaturas (exemplo em binário)
+    FILE *fAssinaturas = fopen("ficheiros/dat/assinaturas.dat", "wb");
+    if (fAssinaturas != NULL) {
+        NoAssinatura *atual = assinaturas;
+        while (atual != NULL) {
+            fwrite(&atual->dados, sizeof(Assinatura), 1, fAssinaturas);
+            atual = atual->proximo;
+        }
+        fclose(fAssinaturas);
+    } else {
+        printf("Erro ao salvar assinaturas.\n");
+    }
 }
 
 #endif // SISTEMA_H

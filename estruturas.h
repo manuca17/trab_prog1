@@ -18,6 +18,7 @@ typedef struct {
     char nome_documento[100];
     char hash_documento[64]; // SHA-256
     char data_assinatura[11];
+    int assinado; // 1 se assinado, 0 se não
     int id_certificado;
 } Assinatura;
 
