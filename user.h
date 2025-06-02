@@ -17,6 +17,7 @@ void listarUsuarios(NoUsuario *usuarios);
 void alterarTipo_usuario(NoUsuario **usuarios);
 void bloquearUsuario(NoUsuario **usuarios);
 void estatisticasDeUso(NoAssinatura *assin, NoCertificado *certificados, Usuario user);
+void salvarDadosEmFicheiros(NoUsuario *usuarios, NoCertificado *certificados, NoAssinatura *assinaturas);
 
 Usuario currentUser;
 
@@ -34,12 +35,15 @@ void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados, NoAssin
 
     while (usuarios != NULL)
     {
+        
         if (strcmp(atual->dados.username, username) == 0 && strcmp(atual->dados.password, password) == 0)
         {
+            
 
             if (atual->dados.tipo == ADMIN)
             {
-                currentUser = atual->dados; // Armazena o usuário atual
+                currentUser = atual->dados;
+                 // Armazena o usuário atual
                 printf("Bem-vindo, administrador!\n");
                 menuAdmin(&usuarios, &certificados);
             }
@@ -197,6 +201,7 @@ void menuAdmin(NoUsuario **usuarios, NoCertificado **certificados)
 
         case 0:
             printf("\nVoltando ao menu principal...\n");
+            salvarDadosEmFicheiros(*usuarios, *certificados, NULL);
             break;
 
         default:
@@ -309,6 +314,7 @@ void menuUsuario(NoAssinatura **assin, NoCertificado **certificados, Usuario use
             break;
         case 0:
             printf("Saindo do menu usuário...\n");
+            salvarDadosEmFicheiros(NULL, *certificados, *assin);
             break;
         default:
             printf("Opção inválida! Tente novamente.\n");
@@ -343,4 +349,54 @@ void estatisticasDeUso(NoAssinatura *assin, NoCertificado *certificados, Usuario
     printf("Total de Assinaturas: %d\n", totalAssinaturas);
     printf("Total de Certificados: %d\n", totalCertificados);
 }
+
+void salvarDadosEmFicheiros(NoUsuario *usuarios, NoCertificado *certificados, NoAssinatura *assinaturas) {
+    // Salvar usuários (exemplo em binário)
+    FILE *fUsuarios = fopen("ficheiros/dat/users.dat", "wb");
+    if (fUsuarios != NULL) {
+        NoUsuario *atual = usuarios;
+        while (atual != NULL) {
+            fwrite(&atual->dados, sizeof(Usuario), 1, fUsuarios);
+            atual = atual->proximo;
+        }
+        fclose(fUsuarios);
+    } else {
+        printf("Erro ao salvar usuários.\n");
+    }
+
+    // Salvar certificados (exemplo em texto)
+    FILE *fCertificados = fopen("ficheiros/text/relatorio_certificados.txt", "w");
+    if (fCertificados != NULL) {
+        NoCertificado *atual = certificados;
+        while (atual != NULL) {
+            fprintf(fCertificados, "%d %s %s %s %s %s %s\n",
+                atual->dados.id,
+                atual->dados.nome,
+                atual->dados.email,
+                atual->dados.data_emissao,
+                atual->dados.data_validade,
+                atual->dados.estado,
+                atual->dados.chave_publica
+            );
+            atual = atual->proximo;
+        }
+        fclose(fCertificados);
+    } else {
+        printf("Erro ao salvar certificados.\n");
+    }
+
+    // Salvar assinaturas (exemplo em binário)
+    FILE *fAssinaturas = fopen("ficheiros/dat/assinaturas.dat", "wb");
+    if (fAssinaturas != NULL) {
+        NoAssinatura *atual = assinaturas;
+        while (atual != NULL) {
+            fwrite(&atual->dados, sizeof(Assinatura), 1, fAssinaturas);
+            atual = atual->proximo;
+        }
+        fclose(fAssinaturas);
+    } else {
+        printf("Erro ao salvar assinaturas.\n");
+    }
+}
+    
 #endif // USERS_H
