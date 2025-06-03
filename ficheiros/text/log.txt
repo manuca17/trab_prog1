@@ -1,0 +1,5 @@
+[2025-06-03 18:35:36] -- Tipo de usuário alterado: user1 para 0
+[2025-06-03 18:35:45] -- Usuário bloqueado: user1
+[2025-06-03 18:38:07] -- Administrador admin autenticado com sucesso.
+[2025-06-03 18:51:56] -- Administrador admin autenticado com sucesso.
+[2025-06-03 18:53:01] -- Certificado ID 1 expirado automaticamente.

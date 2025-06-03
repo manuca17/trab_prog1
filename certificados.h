@@ -22,6 +22,7 @@ void alertasExpiracao();
 
 void criarCertificado(NoCertificado **certificados, NoUsuario *usuarios)
 {
+    int id_usuario;
     Certificado *cert = (Certificado *)malloc(sizeof(Certificado));
     if (cert == NULL)
     {
@@ -29,8 +30,10 @@ void criarCertificado(NoCertificado **certificados, NoUsuario *usuarios)
         return;
     }
     // Solicitar os dados do certificado ao administrador
-    printf("Digite o ID do certificado: ");
-    scanf("%d", &cert->id);
+    cert->id = rand() % 10000; // Gerar um ID aleatório para o certificado
+
+    printf("Insira o ID do usuário ao qual o certificado será atribuído: ");
+    scanf("%d", &id_usuario);
 
     printf("Digite o nome do titular do certificado: ");
     scanf(" %[^\n]", cert->nome); // Lê uma string com espaços
@@ -50,6 +53,27 @@ void criarCertificado(NoCertificado **certificados, NoUsuario *usuarios)
     printf("Digite a chave pública do certificado: ");
     scanf(" %[^\n]", cert->chave_publica);
 
+    
+
+    NoUsuario *atual = usuarios;
+    int usuario_encontrado = 0;
+    while (atual != NULL)
+    {
+        if (atual->dados.userId == id_usuario)
+        {
+            usuario_encontrado = 1;
+            cert->userId = atual->dados.userId; // Atribuir o ID do usuário ao certificado
+            break;
+        }
+        else
+        {
+            printf("Usuário com ID %d não encontrado.\n", id_usuario);
+            free(cert); // Liberar a memória alocada para o certificado
+            return;
+        }
+        atual = atual->proximo;
+    }
+
     // Criar um novo nó para o certificado
     NoCertificado *novo = (NoCertificado *)malloc(sizeof(NoCertificado));
     if (novo == NULL)
@@ -66,27 +90,6 @@ void criarCertificado(NoCertificado **certificados, NoUsuario *usuarios)
     *certificados = novo;
 
     // Procurar o usuário pelo nome e atribuir o ID do certificado
-    NoUsuario *atual = usuarios;
-    int encontrado = 0;
-    while (atual != NULL)
-    {
-        if (strcmp(atual->dados.username, cert->nome) == 0)
-        {
-            atual->dados.id_certificado = cert->id;
-            encontrado = 1;
-            break;
-        }
-        atual = atual->proximo;
-    }
-
-    if (encontrado)
-    {
-        printf("Certificado criado e atribuído ao usuário '%s' com sucesso!\n", cert->nome);
-    }
-    else
-    {
-        printf("Usuário '%s' não encontrado. Certificado criado, mas não atribuído a nenhum usuário.\n", cert->nome);
-    }
 }
 
 void listarCertificados(NoCertificado *certificados)
@@ -104,6 +107,7 @@ void listarCertificados(NoCertificado *certificados)
     while (atual != NULL)
     {
         printf("ID: %d\n", atual->dados.id);
+        printf("ID do Usuário: %d\n", atual->dados.userId);
         printf("Nome: %s\n", atual->dados.nome);
         printf("Email: %s\n", atual->dados.email);
         printf("Data de Emissão: %s\n", atual->dados.data_emissao);
@@ -385,8 +389,8 @@ void destruirCertificado(NoCertificado **certificados)
     printf("Certificado com ID %d não encontrado.\n", id);
 }
 
-
-void listarCertificadoUsuario(NoCertificado *certificados, Usuario user){
+void listarCertificadoUsuario(NoCertificado *certificados, Usuario user)
+{
     if (certificados == NULL)
     {
         printf("Nenhum certificado encontrado.\n");
@@ -399,7 +403,7 @@ void listarCertificadoUsuario(NoCertificado *certificados, Usuario user){
     NoCertificado *atual = certificados; // Usar um ponteiro auxiliar para percorrer a lista
     while (atual != NULL)
     {
-        if (atual->dados.id == user.id_certificado)
+        if (atual->dados.userId == user.userId) // Verifica se o certificado pertence ao usuário
         {
             printf("ID: %d\n", atual->dados.id);
             printf("Nome: %s\n", atual->dados.nome);

@@ -119,9 +119,9 @@ void carregarCertificados(NoCertificado **certificados)
     while (!feof(file))
     {
         Certificado temp;
-        if (fscanf(file, "%d %99s %99s %10s %10s %19s %255s",
-                   &temp.id, temp.nome, temp.email, temp.data_emissao,
-                   temp.data_validade, temp.estado, temp.chave_publica) == 7)
+        if (fscanf(file, "%d %d %99s %99s %10s %10s %19s %255s",
+                   &temp.id, &temp.userId,  temp.nome, temp.email, temp.data_emissao,
+                   temp.data_validade, temp.estado, temp.chave_publica) == 8)
         {
             // Criar um novo nó para o certificado
             NoCertificado *novo = (NoCertificado *)malloc(sizeof(NoCertificado));
@@ -171,9 +171,12 @@ void carregarAssinaturas(NoAssinatura **assinaturas)
 
 void iniciarSistema(NoUsuario **usuarios, NoCertificado **certificados, NoAssinatura **assinaturas)
 {
-    //carregarDadosFicticios();
+     // Atualiza o estado dos certificados
+    carregarDadosFicticios();
     carregarDados(usuarios, certificados, assinaturas);
+    atualizarEstadoCertificados(*certificados);
     menuPrincipal(usuarios, certificados, assinaturas);
+    
 }
 
 

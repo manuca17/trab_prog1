@@ -9,6 +9,8 @@ void destruirAssinatura(NoAssinatura **assin);
 void listarAssinaturas(NoAssinatura *assin);
 void consultarHistoricoAssinaturas(NoAssinatura *assin, NoCertificado *certificados, Usuario user);
 
+#include <time.h>
+// ...existing code...
 
 void criarAssinatura(NoAssinatura **assin, NoCertificado *certificados)
 {
@@ -38,8 +40,11 @@ void criarAssinatura(NoAssinatura **assin, NoCertificado *certificados)
     printf("Insira o nome do documento: ");
     scanf(" %[^\n]", assinatura.nome_documento);
 
-    printf("Insira a data da assinatura (DD/MM/AAAA): ");
-    scanf(" %10s", assinatura.data_assinatura);
+    // Gerar data atual automaticamente
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    snprintf(assinatura.data_assinatura, sizeof(assinatura.data_assinatura), "%02d/%02d/%04d",
+             tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
 
     // Gerar hash aleatório para o documento (simulação)
     gerarString64(assinatura.hash_documento);
@@ -59,6 +64,7 @@ void criarAssinatura(NoAssinatura **assin, NoCertificado *certificados)
     *assin = novo;
 
     printf("Assinatura criada com sucesso!\n");
+    printf("Data da assinatura: %s\n", assinatura.data_assinatura);
 }
 
 void consultarHistoricoAssinaturas(NoAssinatura *assin, NoCertificado *certificados, Usuario user)
@@ -67,20 +73,33 @@ void consultarHistoricoAssinaturas(NoAssinatura *assin, NoCertificado *certifica
     printf("\n===== Histórico de Assinaturas do Usuário: %s =====\n", user.username);
 
     // Percorre a lista de assinaturas
-    while (assin != NULL) {
-        // Verifica se a assinatura foi feita com o certificado do usuário
-        if (assin->dados.id_certificado == user.id_certificado) {
-            encontrou = 1;
-            printf("ID da Assinatura: %d\n", assin->dados.id);
-            printf("Nome do Documento: %s\n", assin->dados.nome_documento);
-            printf("Hash do Documento: %s\n", assin->dados.hash_documento);
-            printf("Data da Assinatura: %s\n", assin->dados.data_assinatura);
-            printf("-------------------------------\n");
+    while (assin != NULL)
+    {
+        // Procurar o certificado associado à assinatura
+        NoCertificado *cert = certificados;
+        while (cert != NULL)
+        {
+            if (cert->dados.id == assin->dados.id_certificado)
+            {
+                // Verifica se o certificado pertence ao usuário
+                if (cert->dados.userId == user.userId)
+                {
+                    encontrou = 1;
+                    printf("ID da Assinatura: %d\n", assin->dados.id);
+                    printf("Nome do Documento: %s\n", assin->dados.nome_documento);
+                    printf("Hash do Documento: %s\n", assin->dados.hash_documento);
+                    printf("Data da Assinatura: %s\n", assin->dados.data_assinatura);
+                    printf("-------------------------------\n");
+                }
+                break; // Certificado encontrado, não precisa continuar procurando
+            }
+            cert = cert->proximo;
         }
         assin = assin->proximo;
     }
 
-    if (!encontrou) {
+    if (!encontrou)
+    {
         printf("Nenhuma assinatura encontrada para este usuário.\n");
     }
 }

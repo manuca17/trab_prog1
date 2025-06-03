@@ -18,6 +18,7 @@ void alterarTipo_usuario(NoUsuario **usuarios);
 void bloquearUsuario(NoUsuario **usuarios);
 void estatisticasDeUso(NoAssinatura *assin, NoCertificado *certificados, Usuario user);
 void salvarDadosEmFicheiros(NoUsuario *usuarios, NoCertificado *certificados, NoAssinatura *assinaturas);
+int proximoUserId(NoUsuario *usuarios);
 
 Usuario currentUser;
 
@@ -78,9 +79,8 @@ void registrarUsuario(NoUsuario **usuarios)
     scanf("%49s", novo->dados.username);
     printf("Digite a senha: ");
     scanf("%49s", novo->dados.password);
-    novo->dados.tipo = USUARIO;      // Tipo padrão
-    novo->dados.id_certificado = -1; // Sem certificado inicialmente
-
+    novo->dados.tipo = USUARIO;
+    novo->dados.userId = proximoUserId(*usuarios);      // Tipo padrão
     novo->proximo = *usuarios;
     *usuarios = novo;
     escreverLog("Usuário registrado: %s", novo->dados.username);
@@ -334,7 +334,7 @@ void estatisticasDeUso(NoAssinatura *assin, NoCertificado *certificados, Usuario
     // Contar assinaturas do usuário
     NoAssinatura *atualAssinatura = assin;
     while (atualAssinatura != NULL) {
-        if (atualAssinatura->dados.id_certificado == user.id_certificado) {
+        if (atualAssinatura->dados.id_certificado == user.userId) {
             totalAssinaturas++;
         }
         atualAssinatura = atualAssinatura->proximo;
@@ -343,7 +343,7 @@ void estatisticasDeUso(NoAssinatura *assin, NoCertificado *certificados, Usuario
     // Contar certificados do usuário
     NoCertificado *atualCertificado = certificados;
     while (atualCertificado != NULL) {
-        if (atualCertificado->dados.id == user.id_certificado) {
+        if (atualCertificado->dados.id == user.userId) {
             totalCertificados++;
         }
         atualCertificado = atualCertificado->proximo;
@@ -401,6 +401,18 @@ void salvarDadosEmFicheiros(NoUsuario *usuarios, NoCertificado *certificados, No
     } else {
         printf("Erro ao salvar assinaturas.\n");
     }
+}
+
+int proximoUserId(NoUsuario *usuarios) {
+    int maxId = 0;
+    NoUsuario *atual = usuarios;
+    while (atual != NULL) {
+        if (atual->dados.userId > maxId) {
+            maxId = atual->dados.userId;
+        }
+        atual = atual->proximo;
+    }
+    return maxId + 1;
 }
     
 #endif // USERS_H

@@ -4,6 +4,7 @@
 // Certificado
 typedef struct {
     int id;
+    int userId;
     char nome[100];
     char email[100];
     char data_emissao[11]; // formato DD/MM/AAAA
@@ -30,10 +31,10 @@ typedef enum {
 
 // Usuário
 typedef struct {
+    int userId;
     char username[50];
     char password[50];
     TipoUsuario tipo;
-    int id_certificado; // -1 se não tiver
 } Usuario;
 
 // Nó para lista de certificados
