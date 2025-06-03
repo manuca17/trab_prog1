@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 
+void escreverLog();
 
 void esperarTecla();
 void gerarString64(char *destino);
@@ -74,6 +75,23 @@ void gerarString64(char *destino) {
         destino[i] = charset[key];
     }
     destino[64] = '\0'; // Termina a string
+}
+
+
+void escreverLog(char logMessage[]) {
+    FILE *logFile = fopen("ficheiros/text/log.txt", "w");
+    if (logFile == NULL) {
+        printf("Erro ao abrir o arquivo de log.\n");
+        return;
+    }
+
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    char buffer[20];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", t);
+
+    fprintf(logFile, "[%s] -- %s.\n", buffer, logMessage);
+    fclose(logFile);
 }
 
 #endif 

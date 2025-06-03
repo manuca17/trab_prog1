@@ -46,6 +46,7 @@ void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados, NoAssin
                  // Armazena o usuário atual
                 printf("Bem-vindo, administrador!\n");
                 menuAdmin(&usuarios, &certificados);
+                escreverLog("Administrador %s autenticado com sucesso.", currentUser.username);
             }
             else if (atual->dados.tipo == USUARIO)
             {
@@ -53,6 +54,7 @@ void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados, NoAssin
                 printf("Bem-vindo, usuário!\n");
                 autenticado = 1;
                 menuUsuario(&assin, &certificados, currentUser);
+                escreverLog("Usuário %s autenticado com sucesso.", currentUser.username);
                 break;
             }
             else
@@ -81,7 +83,7 @@ void registrarUsuario(NoUsuario **usuarios)
 
     novo->proximo = *usuarios;
     *usuarios = novo;
-
+    escreverLog("Usuário registrado: %s", novo->dados.username);
     printf("Usuário registrado com sucesso!\n");
 }
 
@@ -234,6 +236,7 @@ void alterarTipo_usuario(NoUsuario **usuarios)
         {
             atual->dados.tipo = novoTipo;
             printf("Tipo de usuário alterado com sucesso!\n");
+            escreverLog("Tipo de usuário alterado: %s para %d", atual->dados.username, novoTipo);
             return;
         }
         atual = atual->proximo;
@@ -263,6 +266,7 @@ void bloquearUsuario(NoUsuario **usuarios)
             {
                 anterior->proximo = atual->proximo; // Remove o nó do meio ou fim
             }
+            escreverLog("Usuário bloqueado: %s", atual->dados.username);
             free(atual);
             printf("Usuário bloqueado com sucesso!\n");
             return;
