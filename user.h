@@ -43,6 +43,12 @@ void autenticarUsuario(NoUsuario *usuarios, NoCertificado *certificados, NoAssin
 
             if (atual->dados.tipo == ADMIN)
             {
+                if (strcmp(atual->dados.username,"admin") == 0 && strcmp(atual->dados.password, "admin") == 0 ) // Verifica se é o usuário administrador padrão
+                {
+                    printf("Insira uma nova password para o administrador: ");
+                    scanf("%49s", atual->dados.password);
+                }
+                
                 currentUser = atual->dados;
                  // Armazena o usuário atual
                 printf("Bem-vindo, administrador!\n");
